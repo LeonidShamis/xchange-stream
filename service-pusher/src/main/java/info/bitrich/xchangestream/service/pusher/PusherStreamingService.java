@@ -1,6 +1,7 @@
 package info.bitrich.xchangestream.service.pusher;
 
 import com.pusher.client.Pusher;
+import com.pusher.client.PusherOptions;
 import com.pusher.client.channel.Channel;
 import com.pusher.client.connection.ConnectionEventListener;
 import com.pusher.client.connection.ConnectionState;
@@ -23,6 +24,12 @@ public class PusherStreamingService {
         pusher = new Pusher(apiKey);
     }
 
+    public PusherStreamingService(String apiKey, String cluster) {
+        PusherOptions options = new PusherOptions();
+        options.setCluster(cluster);
+        pusher = new Pusher(apiKey, options);
+    }
+
     /**
      * Testing constructor
      */
@@ -43,7 +50,11 @@ public class PusherStreamingService {
 
             @Override
             public void onError(String message, String code, Exception throwable) {
-                e.onError(throwable);
+                if (throwable != null) {
+                    e.onError(throwable);
+                } else {
+                    e.onError(new RuntimeException("No exception found: [code: " + code + "], message: " + message));
+                }
             }
         }, ConnectionState.ALL));
     }
