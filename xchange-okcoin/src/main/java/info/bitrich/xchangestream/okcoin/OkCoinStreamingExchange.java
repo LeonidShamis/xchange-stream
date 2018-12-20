@@ -1,8 +1,10 @@
 package info.bitrich.xchangestream.okcoin;
 
+import info.bitrich.xchangestream.core.ProductSubscription;
 import info.bitrich.xchangestream.core.StreamingExchange;
 import info.bitrich.xchangestream.core.StreamingMarketDataService;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import org.knowm.xchange.okcoin.OkCoinExchange;
 
 public class OkCoinStreamingExchange extends OkCoinExchange implements StreamingExchange {
@@ -26,7 +28,7 @@ public class OkCoinStreamingExchange extends OkCoinExchange implements Streaming
     }
 
     @Override
-    public Completable connect() {
+    public Completable connect(ProductSubscription... args) {
         return streamingService.connect();
     }
 
@@ -36,7 +38,25 @@ public class OkCoinStreamingExchange extends OkCoinExchange implements Streaming
     }
 
     @Override
+    public boolean isAlive() {
+        return streamingService.isSocketOpen();
+    }
+
+    @Override
+    public Observable<Throwable> reconnectFailure() {
+        return streamingService.subscribeReconnectFailure();
+    }
+
+    @Override
+    public Observable<Object> connectionSuccess() {
+        return streamingService.subscribeConnectionSuccess();
+    }
+
+    @Override
     public StreamingMarketDataService getStreamingMarketDataService() {
         return streamingMarketDataService;
     }
+
+    @Override
+    public void useCompressedMessages(boolean compressedMessages) { streamingService.useCompressedMessages(compressedMessages); }
 }
